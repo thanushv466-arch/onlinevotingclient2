@@ -1,22 +1,38 @@
-import React, { useState } from 'react';
-import API from '../api';
+import React, { useState } from "react";
+import API from "../api";
+import { useNavigate } from "react-router-dom";
 
-export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+export default function AdminLogin() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleLogin = async () => {
-    const res = await API.post('/auth/login', { email, password });
-    alert("Login Successful! Token: " + res.data.token);
-    localStorage.setItem('token', res.data.token);
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+    if (!email || !password) {
+      setError("Enter both email and password");
+      return;
+    }
+    try {
+      const res = await API.post("/auth/login", { email, password });
+      localStorage.setItem("admin", JSON.stringify(res.data.admin));
+      navigate("/admin");
+    } catch (err) {
+      setError(err.response?.data.msg || "Login failed");
+    }
   };
 
   return (
-    <div style={{textAlign:'center', marginTop:'100px'}}>
+    <div style={{ textAlign: "center", marginTop: "100px" }}>
       <h2>Admin Login</h2>
-      <input placeholder="Email" onChange={(e)=>setEmail(e.target.value)} /><br/><br/>
-      <input type="password" placeholder="Password" onChange={(e)=>setPassword(e.target.value)} /><br/><br/>
-      <button onClick={handleLogin}>Login</button>
+      <form onSubmit={handleLogin}>
+        <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} /><br /><br />
+        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} /><br /><br />
+        <button type="submit" style={{ padding:"10px 20px", backgroundColor:"orange", color:"white", border:"none", cursor:"pointer" }}>Login</button>
+      </form>
+      {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );
 }

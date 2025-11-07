@@ -5,24 +5,31 @@ import { useNavigate } from "react-router-dom";
 export default function VoterLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+    if (!email || !password) { setError("Enter both email & password"); return; }
     try {
       const res = await API.post("/voter/login", { email, password });
       localStorage.setItem("voter", JSON.stringify(res.data));
       navigate("/vote");
     } catch (err) {
-      alert("Invalid credentials");
+      setError(err.response?.data.msg || "Login failed");
     }
   };
 
   return (
     <div style={{ textAlign: "center", marginTop: "100px" }}>
       <h2>Voter Login</h2>
-      <input placeholder="Email" onChange={(e) => setEmail(e.target.value)} /><br />
-      <input type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} /><br /><br />
-      <button onClick={handleLogin}>Login</button>
+      <form onSubmit={handleLogin}>
+        <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} /><br /><br />
+        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} /><br /><br />
+        <button type="submit" style={{ padding:"10px 20px", backgroundColor:"orange", color:"white", border:"none", cursor:"pointer" }}>Login</button>
+      </form>
+      {error && <p style={{ color:"red" }}>{error}</p>}
     </div>
   );
 }
