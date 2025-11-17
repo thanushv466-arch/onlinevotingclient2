@@ -1,19 +1,27 @@
 import React, { useEffect, useState } from "react";
 import API from "../api";
 import { useParams } from "react-router-dom";
+import { Pie } from "react-chartjs-2";
+import "chart.js/auto";
 
 export default function ResultPage() {
   const { id } = useParams();
-  const [winner, setWinner] = useState(null);
+
   const [results, setResults] = useState([]);
-  const [totalVotes, setTotalVotes] = useState(0);
+  const [winner, setWinner] = useState(null);
+  const [declared, setDeclared] = useState(false);
 
   const loadResults = async () => {
     const res = await API.get(`/result/${id}`);
-
-    setWinner(res.data.winner);
     setResults(res.data.results);
-    setTotalVotes(res.data.totalVotes);
+    setWinner(res.data.winner);
+  };
+
+  const declareWinner = async () => {
+    const res = await API.post(`/result/declare/${id}`);
+    alert(res.data.msg);
+    setWinner(res.data.winner);
+    setDeclared(true);
   };
 
   useEffect(() => {
@@ -21,47 +29,55 @@ export default function ResultPage() {
   }, []);
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>📊 Election Results</h2>
+    <div style={{ padding: 30 }}>
+      <h2>Election Results</h2>
 
-      {/* No votes */}
-      {results.length === 0 && <p>No votes yet</p>}
+      {!results.length ? (
+        <h3>No votes yet</h3>
+      ) : (
+        <>
+          <h3>Vote Count</h3>
+          {results.map(r => (
+            <p key={r._id}>
+              <b>{r.name}</b> ({r.party}) — {r.votes} votes
+            </p>
+          ))}
 
-      {/* Winner Section */}
-      {winner && (
-        <div
-          style={{
-            padding: 20,
-            marginBottom: 20,
-            background: "#ffe8a1",
-            border: "2px solid #ffb100",
-            borderRadius: 10
-          }}
-        >
-          <h3>🏆 Winner</h3>
-          <h2>
-            {winner.candidate.name} ({winner.candidate.party})
-          </h2>
-          <p style={{ fontSize: "18px", fontWeight: "bold" }}>
-            Votes: {winner.count}
-          </p>
-        </div>
+          {/* PIE CHART */}
+          <div style={{ width: "320px", marginTop: 20 }}>
+            <Pie
+              data={{
+                labels: results.map(r => r.name),
+                datasets: [
+                  {
+                    data: results.map(r => r.votes),
+                    backgroundColor: ["#ff6384", "#36a2eb", "#ffce56", "#4bc0c0"],
+                  },
+                ],
+              }}
+            />
+          </div>
+
+          {/* WINNER SECTION */}
+          {winner && (
+            <div style={{ marginTop: 30, padding: 20, border: "2px solid green" }}>
+              <h2>🏆 Winner: {winner.name}</h2>
+              <h3>Party: {winner.party}</h3>
+              <h3>Total Votes: {winner.votes}</h3>
+            </div>
+          )}
+
+          {/* DECLARE WINNER BUTTON */}
+          {!declared && (
+            <button
+              style={{ marginTop: 30, padding: "10px 20px", fontSize: 18 }}
+              onClick={declareWinner}
+            >
+              Declare Winner
+            </button>
+          )}
+        </>
       )}
-
-      {/* Full Results */}
-      <h3>📌 Vote Count</h3>
-      <ul>
-        {results.map((r) => (
-          <li key={r.candidate._id}>
-            {r.candidate.name} ({r.candidate.party}) — 
-            <b> {r.count} votes</b>
-          </li>
-        ))}
-      </ul>
-
-      <p style={{ marginTop: 20, fontStyle: "italic" }}>
-        Total votes: {totalVotes}
-      </p>
     </div>
   );
 }
