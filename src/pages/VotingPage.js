@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 
 export default function VotingPage() {
   const { id } = useParams(); 
-  const [voterId, setVoterId] = useState("");
   const [candidates, setCandidates] = useState([]);
 
   const load = async () => {
@@ -13,13 +12,10 @@ export default function VotingPage() {
   };
 
   const vote = async (cid) => {
-    const voter = prompt("Enter your registered voter email:");
-    const password = prompt("Enter your password:");
+    const email = prompt("Enter your voter email:");
+    const password = prompt("Enter your voter password:");
 
-    const login = await API.post("/voter/login", {
-      email: voter,
-      password,
-    });
+    const login = await API.post("/voter/login", { email, password });
 
     await API.post("/vote", {
       voter: login.data._id,
@@ -27,16 +23,16 @@ export default function VotingPage() {
       election: id,
     });
 
-    alert("Vote recorded successfully!");
+    alert("Vote submitted!");
   };
 
   useEffect(() => { load(); }, []);
 
   return (
     <div style={{ padding: 20 }}>
-      <h2>Voting Page</h2>
-      {candidates.map((c) => (
-        <div key={c._id} style={{ margin: "10px 0" }}>
+      <h2>Vote Your Candidate</h2>
+      {candidates.map(c => (
+        <div key={c._id}>
           {c.name} — {c.party}
           <button onClick={() => vote(c._id)}>Vote</button>
         </div>
