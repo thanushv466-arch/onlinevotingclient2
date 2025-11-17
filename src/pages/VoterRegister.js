@@ -1,39 +1,34 @@
 import React, { useState } from "react";
 import API from "../api";
-import { useNavigate } from "react-router-dom";
 
-export default function VoterRegister() {
-  const [voter, setVoter] = useState({ name: "", email: "", password: "", phone: "", address: "" });
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
+export default function VoterRegister({ electionId }) {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const handleChange = (e) => setVoter({ ...voter, [e.target.name]: e.target.value });
+  const register = async () => {
+    if (!name || !email || !password)
+      return alert("All fields required");
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    setError("");
-    if (!voter.name || !voter.email || !voter.password) { setError("Name, Email, Password required"); return; }
-    try {
-      await API.post("/voter/register", voter);
-      alert("Voter registered successfully!");
-      navigate("/voter-login");
-    } catch (err) {
-      setError(err.response?.data.error || "Registration failed");
-    }
+    await API.post("/voter", {
+      name,
+      email,
+      password,
+      election: electionId,
+    });
+
+    alert("Voter added!");
   };
 
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h2>Register as Voter</h2>
-      <form onSubmit={handleRegister}>
-        <input name="name" placeholder="Name" onChange={handleChange} /><br />
-        <input name="email" placeholder="Email" onChange={handleChange} /><br />
-        <input name="password" type="password" placeholder="Password" onChange={handleChange} /><br />
-        <input name="phone" placeholder="Phone" onChange={handleChange} /><br />
-        <input name="address" placeholder="Address" onChange={handleChange} /><br /><br />
-        <button type="submit" style={{ padding:"10px 20px", backgroundColor:"orange", color:"white", border:"none", cursor:"pointer" }}>Register</button>
-      </form>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-    </div>
-  );
+    <div>
+      <h3>Register Voter</h3>
+
+      <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} /><br />
+      <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} /><br />
+      <input placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} /><br />
+
+      <button onClick={register}>Add Voter</button>
+    </div>
+  );
 }

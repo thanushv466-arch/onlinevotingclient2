@@ -1,37 +1,42 @@
 import React, { useState, useEffect } from "react";
 import API from "../api";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 export default function VotingPage() {
-  const { id } = useParams(); // election
-  const query = new URLSearchParams(useLocation().search);
-  const voterId = query.get("voter");
-
+  const { id } = useParams(); 
+  const [voterId, setVoterId] = useState("");
   const [candidates, setCandidates] = useState([]);
 
   const load = async () => {
-    const res = await API.get('/candidate/${id}');
+    const res = await API.get(`/candidate/${id}`);
     setCandidates(res.data);
   };
 
   const vote = async (cid) => {
-    await API.post("/vote", {
-      electionId: id,
-      candidateId: cid,
-      voterId,
+    const voter = prompt("Enter your registered voter email:");
+    const password = prompt("Enter your password:");
+
+    const login = await API.post("/voter/login", {
+      email: voter,
+      password,
     });
-    alert("Vote recorded");
+
+    await API.post("/vote", {
+      voter: login.data._id,
+      candidate: cid,
+      election: id,
+    });
+
+    alert("Vote recorded successfully!");
   };
 
-  useEffect(() => {
-    load();
-  }, []);
+  useEffect(() => { load(); }, []);
 
   return (
     <div style={{ padding: 20 }}>
       <h2>Voting Page</h2>
       {candidates.map((c) => (
-        <div key={c._id}>
+        <div key={c._id} style={{ margin: "10px 0" }}>
           {c.name} — {c.party}
           <button onClick={() => vote(c._id)}>Vote</button>
         </div>

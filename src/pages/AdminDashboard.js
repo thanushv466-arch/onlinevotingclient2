@@ -42,8 +42,15 @@ export default function AdminDashboard() {
       {elections.map((e) => (
         <div key={e._id} style={{ marginBottom: "15px", border: "1px solid #ddd", padding: "10px" }}>
           <b>{e.name}</b><br />
-          <button onClick={() => navigate('/election/${e._id}')}>Open Election Page</button>
-          <button onClick={() => navigate('/results/${e._id}')}>View Results</button>
+
+          <button onClick={() => navigate(`/election/${e._id}`)}>
+            Open Election Page
+          </button>
+
+          <button onClick={() => navigate(`/results/${e._id}`)}>
+            View Results
+          </button>
+
         </div>
       ))}
     </div>
