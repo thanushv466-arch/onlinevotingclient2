@@ -1,35 +1,31 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import API from "../api";
+import { useParams } from "react-router-dom";
 
 export default function ResultPage() {
   const { id } = useParams();
-  const [results, setResults] = useState([]);
+  const [votes, setVotes] = useState([]);
 
-  const load = async () => {
+  const loadResults = async () => {
     const res = await API.get(`/result/${id}`);
-    setResults(res.data);
+    setVotes(res.data);
   };
 
   useEffect(() => {
-    load();
+    loadResults();
   }, []);
 
   return (
     <div style={{ padding: 20 }}>
       <h2>Election Results</h2>
 
-      {results.length === 0 ? (
-        <p>No votes yet.</p>
-      ) : (
-        <ul>
-          {results.map((r) => (
-            <li key={r.candidateId}>
-              <b>{r.name}</b> ({r.party}) — Votes: {r.votes}
-            </li>
-          ))}
-        </ul>
-      )}
+      {votes.length === 0 && <p>No votes yet</p>}
+
+      {votes.map(v => (
+        <p key={v._id}>
+          {v.candidate.name} — voted by {v.voter.email}
+        </p>
+      ))}
     </div>
   );
 }

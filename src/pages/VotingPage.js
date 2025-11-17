@@ -3,7 +3,7 @@ import API from "../api";
 import { useParams } from "react-router-dom";
 
 export default function VotingPage() {
-  const { id } = useParams(); 
+  const { id } = useParams();
   const [candidates, setCandidates] = useState([]);
 
   const load = async () => {
@@ -12,28 +12,30 @@ export default function VotingPage() {
   };
 
   const vote = async (cid) => {
-    const email = prompt("Enter your voter email:");
-    const password = prompt("Enter your voter password:");
+    const email = prompt("Voter email:");
+    const password = prompt("Password:");
 
     const login = await API.post("/voter/login", { email, password });
 
     await API.post("/vote", {
-      voter: login.data._id,
-      candidate: cid,
       election: id,
+      candidate: cid,
+      voter: login.data._id
     });
 
-    alert("Vote submitted!");
+    alert("Vote Submitted!");
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   return (
     <div style={{ padding: 20 }}>
       <h2>Vote Your Candidate</h2>
       {candidates.map(c => (
         <div key={c._id}>
-          {c.name} — {c.party}
+          {c.name} — {c.party} 
           <button onClick={() => vote(c._id)}>Vote</button>
         </div>
       ))}
