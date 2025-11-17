@@ -1,35 +1,21 @@
 import React, { useState } from "react";
 import API from "../api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function VoterLogin() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [voterId, setVoterId] = useState("");
   const navigate = useNavigate();
+  const { id } = useParams();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setError("");
-    if (!email || !password) { setError("Enter both email & password"); return; }
-    try {
-      const res = await API.post("/voter/login", { email, password });
-      localStorage.setItem("voter", JSON.stringify(res.data));
-      navigate("/vote");
-    } catch (err) {
-      setError(err.response?.data.msg || "Login failed");
-    }
+  const login = async () => {
+    navigate('/vote/${id}?voter=${voterId}');
   };
 
   return (
-    <div style={{ textAlign: "center", marginTop: "100px" }}>
+    <div style={{ padding: 20 }}>
       <h2>Voter Login</h2>
-      <form onSubmit={handleLogin}>
-        <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} /><br /><br />
-        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} /><br /><br />
-        <button type="submit" style={{ padding:"10px 20px", backgroundColor:"orange", color:"white", border:"none", cursor:"pointer" }}>Login</button>
-      </form>
-      {error && <p style={{ color:"red" }}>{error}</p>}
-    </div>
-  );
+      <input placeholder="Your Voter ID" value={voterId} onChange={(e)=>setVoterId(e.target.value)} />
+      <button onClick={login}>Enter Voting</button>
+    </div>
+  );
 }

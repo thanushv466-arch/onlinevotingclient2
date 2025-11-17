@@ -1,87 +1,153 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import API from "../api";
 
-const ElectionPage = () => {
-  const [elections, setElections] = useState([]);   // Existing elections
-  const [newElection, setNewElection] = useState(""); // New election name
+export default function ElectionPage() {
+  const { id } = useParams();   // election id
+  const navigate = useNavigate();
 
-  // Backend URL from .env
-  const API_URL = process.env.REACT_APP_API_URL;
+  const [election, setElection] = useState({});
+  const [candidates, setCandidates] = useState([]);
+  const [voters, setVoters] = useState([]);
 
-  // Fetch elections on page load
+  const [candidateName, setCandidateName] = useState("");
+  const [candidateParty, setCandidateParty] = useState("");
+
+  const [voterName, setVoterName] = useState("");
+  const [voterEmail, setVoterEmail] = useState("");
+  const [voterId, setVoterId] = useState("");
+
+  // ---------------- Fetch election details ----------------
+  const fetchElection = async () => {
+    const res = await API.get('/election');
+    const selected = res.data.find((e) => e._id === id);
+    setElection(selected || {});
+  };
+
+  // ---------------- Fetch candidates ----------------
+  const fetchCandidates = async () => {
+    const res = await API.get('/candidate/${id}');
+    setCandidates(res.data);
+  };
+
+  // ---------------- Fetch voters ----------------
+  const fetchVoters = async () => {
+    const res = await API.get('/voter/${id}');
+    setVoters(res.data);
+  };
+
+  // ---------------- Add candidate ----------------
+  const addCandidate = async () => {
+    if (!candidateName || !candidateParty)
+      return alert("Please enter candidate name and party");
+
+    await API.post("/candidate", {
+      name: candidateName,
+      party: candidateParty,
+      electionId: id,
+    });
+
+    setCandidateName("");
+    setCandidateParty("");
+    fetchCandidates();
+  };
+
+  // ---------------- Add voter ----------------
+  const addVoter = async () => {
+    if (!voterName || !voterEmail || !voterId)
+      return alert("Fill all voter details");
+
+    await API.post("/voter", {
+      name: voterName,
+      email: voterEmail,
+      voterId,
+      electionId: id,
+    });
+
+    setVoterName("");
+    setVoterEmail("");
+    setVoterId("");
+    fetchVoters();
+  };
+
   useEffect(() => {
-    fetchElections();
+    fetchElection();
+    fetchCandidates();
+    fetchVoters();
   }, []);
 
-  const fetchElections = async () => {
-    try {
-      const res = await fetch({$API_URL}/getElections);
-      const data = await res.json();
-      setElections(data);  // Update state to display
-    } catch (error) {
-      console.error("Error fetching elections:", error);
-    }
-  };
-
-  const handleAddElection = async () => {
-    if (!newElection) {
-      alert("Please enter election name");
-      return;
-    }
-
-    try {
-      const res = await fetch({$API_URL}/addElection, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newElection })
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        // Option 1: Add new election directly to state
-        setElections([...elections, data]);  
-
-        // Option 2 (alternative): Re-fetch all elections
-        // await fetchElections();
-
-        setNewElection(""); // Clear input
-      } else {
-        alert(data.message || "Failed to add election");
-      }
-    } catch (error) {
-      console.error("Error adding election:", error);
-      alert("Error adding election");
-    }
-  };
-
   return (
-    <div>
-      <h1>Election Management</h1>
+    <div style={{ padding: "20px" }}>
+      <h2>Election: {election?.name}</h2>
 
-      {/* Add Election */}
-      <div>
-        <input
-          type="text"
-          placeholder="Enter election name"
-          value={newElection}
-          onChange={(e) => setNewElection(e.target.value)}
-        />
-        <button onClick={handleAddElection}>Add Election</button>
-      </div>
+      <hr />
 
-      {/* Existing Elections */}
-      <h2>Existing Elections:</h2>
-      {elections.length === 0 ? (
-        <p>No elections yet.</p>
-      ) : (
-        <ul>
-          {elections.map((e) => (
-            <li key={e.id || e._id}>{e.name}</li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-};
+      {/* ---------------- Add Candidate ---------------- */}
+      <h3>Add Candidate</h3>
+      <input
+        placeholder="Candidate Name"
+        value={candidateName}
+        onChange={(e) => setCandidateName(e.target.value)}
+      />{" "}
+      <input
+        placeholder="Party"
+        value={candidateParty}
+        onChange={(e) => setCandidateParty(e.target.value)}
+      />{" "}
+      <button onClick={addCandidate}>Add Candidate</button>
 
-export default ElectionPage;
+      <h4>Candidate List</h4>
+      <ul>
+        {candidates.map((c) => (
+          <li key={c._id}>
+            {c.name} — {c.party}
+          </li>
+        ))}
+      </ul>
+
+      <hr />
+
+      {/* ---------------- Add Voter ---------------- */}
+      <h3>Add Voter</h3>
+      <input
+        placeholder="Voter Name"
+        value={voterName}
+        onChange={(e) => setVoterName(e.target.value)}
+      />{" "}
+      <input
+        placeholder="Voter Email"
+        value={voterEmail}
+        onChange={(e) => setVoterEmail(e.target.value)}
+      />{" "}
+      <input
+        placeholder="Voter ID"
+        value={voterId}
+        onChange={(e) => setVoterId(e.target.value)}
+      />{" "}
+      <button onClick={addVoter}>Add Voter</button>
+
+      <h4>Voter List</h4>
+      <ul>
+        {voters.map((v) => (
+          <li key={v._id}>
+            {v.name} — {v.voterId}
+          </li>
+        ))}
+      </ul>
+
+      <hr />
+
+      {/* ---------------- Navigation Buttons ---------------- */}
+      <h3>Election Actions</h3>
+
+      <button onClick={() => navigate('/vote/${id}')}>
+        Go to Voting Page
+      </button>{" "}
+      <button onClick={() => navigate('/results/${id}')}>
+        View Results
+      </button>{" "}
+
+      <button onClick={() => navigate("/admin")}>Back to Dashboard</button>
+    </div>
+  );
+}

@@ -1,43 +1,41 @@
 import React, { useState, useEffect } from "react";
 import API from "../api";
+import { useParams, useLocation } from "react-router-dom";
 
 export default function VotingPage() {
-  const [candidates, setCandidates] = useState([]);
-  const voter = JSON.parse(localStorage.getItem("voter"));
+  const { id } = useParams(); // election
+  const query = new URLSearchParams(useLocation().search);
+  const voterId = query.get("voter");
 
-  const fetchCandidates = async () => {
-    const res = await API.get("/candidate");
+  const [candidates, setCandidates] = useState([]);
+
+  const load = async () => {
+    const res = await API.get('/candidate/${id}');
     setCandidates(res.data);
   };
 
-  const castVote = async (candidateId, electionId) => {
-    try {
-      await API.post("/vote", { voterId: voter._id, candidateId, electionId });
-      alert("Vote recorded successfully!");
-      voter.hasVoted = true;
-      localStorage.setItem("voter", JSON.stringify(voter));
-    } catch (err) {
-      alert(err.response?.data.msg || "Voting failed");
-    }
+  const vote = async (cid) => {
+    await API.post("/vote", {
+      electionId: id,
+      candidateId: cid,
+      voterId,
+    });
+    alert("Vote recorded");
   };
 
-  useEffect(() => { fetchCandidates(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   return (
-    <div style={{ padding:"30px" }}>
-      <h2>Welcome, {voter?.name}</h2>
-      {voter?.hasVoted ? <p>You have already voted.</p> :
-        <>
-          <h3>Vote for your Candidate</h3>
-          {candidates.map(c => (
-            <div key={c._id} style={{ border:"1px solid #ccc", margin:"10px", padding:"10px" }}>
-              <h4>{c.name}</h4>
-              <p>Party: {c.party?.name}</p>
-              <button onClick={() => castVote(c._id, c.election._id)}>Vote</button>
-            </div>
-          ))}
-        </>
-      }
-    </div>
-  );
+    <div style={{ padding: 20 }}>
+      <h2>Voting Page</h2>
+      {candidates.map((c) => (
+        <div key={c._id}>
+          {c.name} — {c.party}
+          <button onClick={() => vote(c._id)}>Vote</button>
+        </div>
+      ))}
+    </div>
+  );
 }

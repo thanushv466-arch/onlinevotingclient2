@@ -1,23 +1,38 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import API from "../api";
+import { useParams } from "react-router-dom";
 
 export default function ResultPage() {
-  const [results, setResults] = useState([]);
+  const { id } = useParams();
+  const [result, setResult] = useState([]);
+  const [candidates, setCandidates] = useState([]);
 
-  useEffect(() => { API.get("/result").then(res => setResults(res.data)); }, []);
+  const load = async () => {
+    const r = await API.get('/result/${id}');
+    setResult(r.data);
+
+    const c = await API.get('/candidate/${id}');
+    setCandidates(c.data);
+  };
+
+  const getName = (cid) => {
+    const c = candidates.find((x) => x._id === cid);
+    return c ? c.name : "Unknown";
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
 
   return (
-    <div style={{ padding:"30px" }}>
+    <div style={{ padding: 20 }}>
       <h2>Election Results</h2>
-      {results.length===0 && <p>No results yet</p>}
-      {results.map(r => (
-        <div key={r._id} style={{ margin:"10px", padding:"10px", border:"1px solid gray" }}>
-          <h4>{r.election?.name}</h4>
-          <p>Winner: {r.winner?.name}</p>
-          <p>Total Votes: {r.totalVotes}</p>
-          <p>Status: {r.status}</p>
+
+      {result.map((r) => (
+        <div key={r._id}>
+          {getName(r._id)} — <b>{r.votes} votes</b>
         </div>
       ))}
-    </div>
-  );
+    </div>
+  );
 }

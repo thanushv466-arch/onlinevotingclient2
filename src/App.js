@@ -1,11 +1,11 @@
-import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
-import VoterLogin from "./pages/VoterLogin";
-import VoterRegister from "./pages/VoterRegister";
-import VotingPage from "./pages/VotingPage";
+import ElectionPage from "./pages/ElectionPage";
 import ResultPage from "./pages/ResultPage";
+import VoterLogin from "./pages/VoterLogin";
+import VotingPage from "./pages/VotingPage";
 
 function App() {
   return (
@@ -13,13 +13,15 @@ function App() {
       <Routes>
         <Route path="/" element={<AdminLogin />} />
         <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/voter-login" element={<VoterLogin />} />
-        <Route path="/voter-register" element={<VoterRegister />} />
-        <Route path="/vote" element={<VotingPage />} />
-        <Route path="/result" element={<ResultPage />} />
+
+        <Route path="/election/:id" element={<ElectionPage />} />
+        <Route path="/results/:id" element={<ResultPage />} />
+
+        <Route path="/voter/login/:id" element={<VoterLogin />} />
+        <Route path="/vote/:id" element={<VotingPage />} />
       </Routes>
     </BrowserRouter>
   );
 }
 
-export default App;
+export default App;
