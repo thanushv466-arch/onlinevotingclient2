@@ -1,23 +1,14 @@
 import React, { useEffect, useState } from "react";
-import API from "../api";
 import { useParams } from "react-router-dom";
+import API from "../api";
 
 export default function ResultPage() {
   const { id } = useParams();
-  const [result, setResult] = useState([]);
-  const [candidates, setCandidates] = useState([]);
+  const [results, setResults] = useState([]);
 
   const load = async () => {
-    const r = await API.get('/result/${id}');
-    setResult(r.data);
-
-    const c = await API.get('/candidate/${id}');
-    setCandidates(c.data);
-  };
-
-  const getName = (cid) => {
-    const c = candidates.find((x) => x._id === cid);
-    return c ? c.name : "Unknown";
+    const res = await API.get(`/result/${id}`);
+    setResults(res.data);
   };
 
   useEffect(() => {
@@ -28,11 +19,17 @@ export default function ResultPage() {
     <div style={{ padding: 20 }}>
       <h2>Election Results</h2>
 
-      {result.map((r) => (
-        <div key={r._id}>
-          {getName(r._id)} — <b>{r.votes} votes</b>
-        </div>
-      ))}
+      {results.length === 0 ? (
+        <p>No votes yet.</p>
+      ) : (
+        <ul>
+          {results.map((r) => (
+            <li key={r.candidateId}>
+              <b>{r.name}</b> ({r.party}) — Votes: {r.votes}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
