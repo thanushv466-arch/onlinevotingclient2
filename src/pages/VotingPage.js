@@ -11,20 +11,24 @@ export default function VotingPage() {
     setCandidates(res.data);
   };
 
-  const vote = async (cid) => {
-    const email = prompt("Voter email:");
-    const password = prompt("Password:");
+ const vote = async (cid) => {
+  const email = prompt("Voter email:");
+  const password = prompt("Voter password:");
 
-    const login = await API.post("/voter/login", { email, password });
+  const login = await API.post("/voter/login", { email, password });
 
-    await API.post("/vote", {
-      election: id,
-      candidate: cid,
-      voter: login.data._id
-    });
-
-    alert("Vote Submitted!");
+  const payload = {
+    election: id,
+    candidate: cid,
+    voter: login.data._id
   };
+
+  console.log("Sending vote payload:", payload);
+
+  await API.post("/vote", payload);
+
+  alert("Vote submitted!");
+};
 
   useEffect(() => {
     load();
