@@ -1,0 +1,130 @@
+/* ============================
+   Global - Indian Election Theme
+   ============================ */
+
+body {
+  font-family: "Segoe UI", sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f5f5f5;
+}
+
+/* Header for Titles */
+h2, h3 {
+  color: #222;
+  text-align: center;
+}
+
+/* Input Fields */
+input {
+  width: 250px;
+  padding: 10px;
+  margin: 8px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  font-size: 15px;
+  outline: none;
+  transition: 0.2s;
+}
+
+input:focus {
+  border-color: #ff9933; /* Saffron */
+  box-shadow: 0 0 5px #ff9933;
+}
+
+/* Primary Buttons */
+button {
+  padding: 10px 20px;
+  background: #138808; /* Green */
+  border: none;
+  color: white;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: #0f6d06;
+}
+
+/* Special Button (Declare Winner) */
+.declare-btn {
+  background: #ff9933;
+  color: white;
+  border-radius: 8px;
+  padding: 12px 25px;
+  font-size: 18px;
+}
+
+.declare-btn:hover {
+  background: #e6862c;
+}
+
+/* Card Box */
+.card {
+  background: white;
+  padding: 20px;
+  margin: 15px auto;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 900px;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Winner Box */
+.winner-box {
+  border: 3px solid #138808;
+  background: #e6ffe6;
+  padding: 15px;
+  margin-top: 20px;
+  border-radius: 10px;
+}
+
+/* Chart */
+.chart-box {
+  margin: auto;
+  width: 330px;
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Admin Dashboard Wrapper */
+.dashboard {
+  padding: 25px;
+  text-align: center;
+}
+
+/* Election List Buttons */
+.small-btn {
+  padding: 8px 14px;
+  font-size: 14px;
+  margin: 6px;
+  background: #1a73e8;
+  border-radius: 5px;
+  color: white;
+  border: none;
+}
+
+.small-btn:hover {
+  background: #1559b0;
+}
+
+/* Voter & Candidate List */
+.list-item {
+  padding: 8px;
+  background: #fafafa;
+  border-radius: 5px;
+  margin: 5px auto;
+  width: 85%;
+  border: 1px solid #ddd;
+}
+
+/* Page Container */
+.container {
+  padding: 20px;
+  max-width: 900px;
+  margin: auto;
+}
