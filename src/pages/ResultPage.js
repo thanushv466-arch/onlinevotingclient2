@@ -13,14 +13,15 @@ export default function ResultPage() {
 
   const loadResults = async () => {
     const res = await API.get(`/result/${id}`);
-    setResults(res.data.results);
-    setWinner(res.data.winner);
+    setResults(res.data.results || []);
+    setWinner(res.data.winner || null);
   };
 
   const declareWinner = async () => {
     const res = await API.post(`/result/declare/${id}`);
     alert(res.data.msg);
     setWinner(res.data.winner);
+    setResults(res.data.results);
     setDeclared(true);
   };
 
