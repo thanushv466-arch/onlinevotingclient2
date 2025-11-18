@@ -30,25 +30,34 @@ export default function ResultPage() {
       alert(err.response?.data?.msg || "Error");
     }
   };
+useEffect(() => {
+    loadResults();
+  }, []);
 
-  useEffect(() => load(), []);
+  if (loading) return <h3>Loading results...</h3>;
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div style={{ padding: 20 }}>
       <h2>Election Results</h2>
-  {/* SHOW SAVED RESULT IF DECLARED */}
+
+      {/* If saved result exists */}
       {savedResult ? (
         <>
-          <h3 style={{ color: "green" }}>🏆 Winner: {savedResult.winner}</h3>
-          <h4>Saved Final Results</h4>
+          <h3 style={{ color: "green" }}>
+            🏆 Winner: {savedResult.winner}
+          </h3>
+
+          <h4>Final Declared Results</h4>
           {savedResult.results.map((r, index) => (
-            <p key={index}>{r.candidateName} — {r.count} votes</p>
+            <p key={index}>
+              {r.candidateName} — {r.count} votes
+            </p>
           ))}
         </>
       ) : (
         <>
-          <h3>Live Results (Not Declared)</h3>
-          {liveResults.length === 0 ? (
+          <h3>Live Results</h3>
+             {liveResults.length === 0 ? (
             <p>No votes yet</p>
           ) : (
             liveResults.map((r) => (
@@ -58,7 +67,7 @@ export default function ResultPage() {
             ))
           )}
 
-          <button onClick={declareWinner} style={{ marginTop: 20 }}>
+          <button style={{ marginTop: 20 }} onClick={declareWinner}>
             Declare Winner
           </button>
         </>
@@ -66,3 +75,4 @@ export default function ResultPage() {
     </div>
   );
 }
+
